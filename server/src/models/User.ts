@@ -1,17 +1,25 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const UserSchema = new Schema({
+export interface IUser extends Document {
+  email: string;
+  password?: string;
+  name: string;
+  role: 'employee' | 'manager';
+  createdAt: Date;
+}
+
+const UserSchema = new Schema<IUser>({
   email: {
     type: String,
     required: true,
-    unique: true, // Garante que não haja dois emails iguais
+    unique: true,
     lowercase: true,
   },
   password: {
     type: String,
     required: true,
-    select: false, // Não mostra a senha em buscas (ex: get users)
+    select: false,
   },
   name: {
     type: String,
@@ -19,8 +27,8 @@ const UserSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['funcionario', 'gerente'], // Só aceita esses dois valores
-    default: 'funcionario',
+    enum: ['employee', 'manager'],
+    default: 'employee',
   },
   createdAt: {
     type: Date,
@@ -29,15 +37,14 @@ const UserSchema = new Schema({
 });
 
 UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+ if (!this.isModified('password') || !this.password) {
     return next();
   }
-
   const hash = await bcrypt.hash(this.password, 10);
   this.password = hash;
   next();
 });
 
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model<IUser>('User', UserSchema);
 
 export default User;

@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
+import tratorRoutes from './routes/tratorRoutes';
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const mongoUri = process.env.MONGO_URI;
 
 app.use(express.json());
 app.use('/auth', authRoutes);
+app.use('/tratores', tratorRoutes);
 
 if (!mongoUri) {
   console.error('Erro: MONGO_URI não definida no arquivo .env');
