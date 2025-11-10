@@ -14,6 +14,7 @@ export interface ICompra extends Document {
   user: IUser['_id']; // Referência ao ID do Usuário
   trator: ITrator['_id']; // Referência ao ID do Trator
   createdAt: Date;
+  isActive: boolean;
 }
 
 const CompraSchema = new Schema({
@@ -58,6 +59,10 @@ const CompraSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
   },
 });
 
