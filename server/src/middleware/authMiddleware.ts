@@ -42,12 +42,8 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     if (typeof decoded === 'object' && decoded !== null && 'id' in decoded && 'role' in decoded) {
       const payload = decoded as DecodedPayload; 
       
-      if (payload.role !== 'manager' && payload.role !== 'employee') {
-        return res.status(401).send({ error: 'Token com permissão inválida.' });
-      }
-      
       req.user = { id: payload.id, role: payload.role };
-      return next(); // Sucesso!
+      return next();
     }
     
     return res.status(401).send({ error: 'Token inválido ou mal formatado.' });

@@ -7,10 +7,6 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.post('/', async (req, res) => {
-  if (req.user?.role !== 'manager') {
-    return res.status(403).send({ error: 'Acesso negado. Somente gerentes podem cadastrar máquinas.' });
-  }
-
   try {
     const { name, modelName, plate } = req.body;
     const trator = await Trator.create({ name, modelName, plate });
