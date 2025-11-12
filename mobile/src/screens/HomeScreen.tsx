@@ -80,6 +80,18 @@ export default function HomeScreen({ navigation }: Props) {
         onPress={() => navigation.navigate('RegisterPurchase')} // 6. Botão de Navegação
       />
 
+      {user?.role === 'manager' && (
+        <View style={styles.managerSection}>
+          <Text style={styles.managerTitle}>Painel do Gerente</Text>
+          <Button
+            title="Cadastrar Novo Funcionário"
+            onPress={() => navigation.navigate('RegisterEmployee')}
+            color="#841584"
+          />
+          {/* Aqui também entrará o botão de Cadastrar Trator */}
+        </View>
+      )}
+
       {/* 7. Lógica de Loading e FlatList */}
       {isLoading ? (
         <ActivityIndicator size="large" style={styles.loader} />
@@ -148,5 +160,19 @@ const styles = StyleSheet.create({
     marginTop: 50,
     fontSize: 16,
     color: '#888',
+  },
+  managerSection: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+  },
+  managerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });

@@ -8,6 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import RegisterPurchaseScreen from '../screens/RegisterPurchaseScreen';
+import RegisterEmployeeScreen from '../screens/RegisterEmployeeScreen';
 
 // Nosso Hook de Autenticação!
 import { useAuth } from '../contexts/AuthContext'; // 1. Importa o hook
@@ -20,6 +21,7 @@ type AuthStackParamList = {
 export type AppStackParamList = {
   Home: undefined;
   RegisterPurchase: undefined;
+  RegisterEmployee: undefined;
 };
 
 export type AppScreenProps<T extends keyof AppStackParamList> =
@@ -57,6 +59,11 @@ export default function RootNavigator() {
             name="RegisterPurchase"
             component={RegisterPurchaseScreen}
             options={{ title: 'Registrar Compra' }}
+          />
+          <AppStack.Screen
+            name="RegisterEmployee"
+            component={RegisterEmployeeScreen}
+            options={{ title: 'Novo Funcionário' }}
           />
         </AppStack.Navigator>
       ) : (
