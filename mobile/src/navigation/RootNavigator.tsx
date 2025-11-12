@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, ActivityIndicator } from 'react-native'; // Para o loading
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 // Nossas Telas
 import LoginScreen from '../screens/LoginScreen';
@@ -15,10 +16,14 @@ import { useAuth } from '../contexts/AuthContext'; // 1. Importa o hook
 type AuthStackParamList = {
   Login: undefined;
 };
-type AppStackParamList = {
+
+export type AppStackParamList = {
   Home: undefined;
   RegisterPurchase: undefined;
 };
+
+export type AppScreenProps<T extends keyof AppStackParamList> =
+  NativeStackScreenProps<AppStackParamList, T>;
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const AppStack = createNativeStackNavigator<AppStackParamList>();
