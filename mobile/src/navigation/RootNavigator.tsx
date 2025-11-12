@@ -9,6 +9,9 @@ import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import RegisterPurchaseScreen from '../screens/RegisterPurchaseScreen';
 import RegisterEmployeeScreen from '../screens/RegisterEmployeeScreen';
+import RegisterTractorScreen from '../screens/RegisterTractorScreen';
+import ManageTractorsScreen from '../screens/ManageTractorsScreen';
+import EditTractorScreen from '../screens/EditTractorScreen';
 
 // Nosso Hook de Autenticação!
 import { useAuth } from '../contexts/AuthContext'; // 1. Importa o hook
@@ -22,6 +25,9 @@ export type AppStackParamList = {
   Home: undefined;
   RegisterPurchase: undefined;
   RegisterEmployee: undefined;
+  RegisterTractor: undefined;
+  ManageTractors: undefined;
+  EditTractor: { tratorId: string };
 };
 
 export type AppScreenProps<T extends keyof AppStackParamList> =
@@ -64,6 +70,21 @@ export default function RootNavigator() {
             name="RegisterEmployee"
             component={RegisterEmployeeScreen}
             options={{ title: 'Novo Funcionário' }}
+          />
+          <AppStack.Screen
+            name="RegisterTractor"
+            component={RegisterTractorScreen}
+            options={{ title: 'Nova Máquina' }}
+          />
+          <AppStack.Screen
+            name="ManageTractors"
+            component={ManageTractorsScreen}
+            options={{ title: 'Gerir Máquinas' }}
+          />
+          <AppStack.Screen
+            name="EditTractor"
+            component={EditTractorScreen}
+            options={{ title: 'Editar Máquina' }}
           />
         </AppStack.Navigator>
       ) : (

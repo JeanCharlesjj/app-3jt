@@ -88,7 +88,20 @@ export default function HomeScreen({ navigation }: Props) {
             onPress={() => navigation.navigate('RegisterEmployee')}
             color="#841584"
           />
-          {/* Aqui também entrará o botão de Cadastrar Trator */}
+          
+          <View style={styles.managerButtonSpacer} /> 
+          <Button
+            title="Cadastrar Nova Máquina"
+            onPress={() => navigation.navigate('RegisterTractor')}
+            color="#007bff"
+          />
+
+          <View style={styles.managerButtonSpacer} /> 
+          <Button
+            title="Gerir Máquinas"
+            onPress={() => navigation.navigate('ManageTractors')}
+            color="#007bff"
+          />
         </View>
       )}
 
@@ -174,5 +187,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
+  },
+  managerButtonSpacer: {
+    height: 10, // Apenas um espaçador
   },
 });
