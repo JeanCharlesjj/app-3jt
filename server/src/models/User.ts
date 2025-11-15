@@ -7,6 +7,7 @@ export interface IUser extends Document {
   name: string;
   role: 'employee' | 'manager';
   createdAt: Date;
+  isActive: boolean;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -33,6 +34,10 @@ const UserSchema = new Schema<IUser>({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
   },
 });
 

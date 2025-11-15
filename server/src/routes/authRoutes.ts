@@ -50,22 +50,29 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // 1. Acha o utilizador (já está correto)
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
       return res.status(400).send({ error: 'Usuário não encontrado.' });
     }
 
+    if (user.isActive === false) {
+      return res.status(403).send({ error: 'Este usuário está desabilitado.' });
+    }
+
+    // 2. Compara a senha (já está correto)
     if (!user.password) {
       return res.status(500).send({ error: 'Erro interno ao buscar senha.' });
     }
-
     if (!(await bcrypt.compare(password, user.password))) {
       return res.status(400).send({ error: 'Senha inválida.' });
     }
 
+    // 3. Gera o token (já está correto)
     const token = generateToken(user.id, user.role);
 
+    // 4. Envia a resposta (já está correto)
     user.password = undefined as any;
     res.send({ user, token });
 
