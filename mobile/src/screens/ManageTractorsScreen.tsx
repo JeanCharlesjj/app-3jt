@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {View,Text,StyleSheet,FlatList,Button,ActivityIndicator,Alert,TouchableOpacity } from 'react-native';
 import api from '../services/api'; // O nosso 'api.ts'
-import { AppScreenProps } from '../navigation/RootNavigator'; // Props de navegação
+import { AppScreenProps } from '../navigation/types';
 import { useIsFocused } from '@react-navigation/native'; // Para recarregar a lista
 
 // 1. Define o tipo do Trator

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Button, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from '../contexts/AuthContext'; // Hook de autenticação
 import api from '../services/api'; // Nosso 'api.ts'
-import { AppScreenProps } from '../navigation/RootNavigator'; // O tipo que criamos
+import { AppScreenProps } from '../navigation/types';
 import { useIsFocused } from '@react-navigation/native'; // Hook para "recarregar"
 
 // 1. Define o tipo de dados da Compra (baseado no nosso backend)
@@ -79,31 +79,6 @@ export default function HomeScreen({ navigation }: Props) {
         title="Cadastrar Nova Compra"
         onPress={() => navigation.navigate('RegisterPurchase')} // 6. Botão de Navegação
       />
-
-      {user?.role === 'manager' && (
-        <View style={styles.managerSection}>
-          <Text style={styles.managerTitle}>Painel do Gerente</Text>
-          <Button
-            title="Cadastrar Novo Funcionário"
-            onPress={() => navigation.navigate('RegisterEmployee')}
-            color="#841584"
-          />
-          
-          <View style={styles.managerButtonSpacer} /> 
-          <Button
-            title="Cadastrar Nova Máquina"
-            onPress={() => navigation.navigate('RegisterTractor')}
-            color="#007bff"
-          />
-
-          <View style={styles.managerButtonSpacer} /> 
-          <Button
-            title="Gerir Máquinas"
-            onPress={() => navigation.navigate('ManageTractors')}
-            color="#007bff"
-          />
-        </View>
-      )}
 
       {/* 7. Lógica de Loading e FlatList */}
       {isLoading ? (

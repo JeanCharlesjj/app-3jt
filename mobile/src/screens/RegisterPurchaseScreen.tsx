@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
-import { AppScreenProps } from '../navigation/RootNavigator'; // Nossas props de navegação
+import { AppScreenProps } from '../navigation/types';
 import api from '../services/api'; // Nosso 'api.ts'
 import { Picker } from '@react-native-picker/picker'; // O seletor que instalamos
 

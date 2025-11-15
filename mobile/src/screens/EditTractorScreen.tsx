@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import api from '../services/api'; // Nosso 'api.ts'
-import { AppScreenProps } from '../navigation/RootNavigator'; // Props de navegação
+import { AppScreenProps } from '../navigation/types';
 
 // Define as props da tela
 type Props = AppScreenProps<'EditTractor'>;

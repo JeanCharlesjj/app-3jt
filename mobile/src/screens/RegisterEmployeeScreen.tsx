@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
 import api from '../services/api'; // O nosso 'api.ts'
-import { AppScreenProps } from '../navigation/RootNavigator'; // Props de navegação
+import { AppScreenProps } from '../navigation/types';
 
 // Define as props da tela
 type Props = AppScreenProps<'RegisterEmployee'>;

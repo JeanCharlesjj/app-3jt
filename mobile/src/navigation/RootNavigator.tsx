@@ -1,47 +1,57 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, ActivityIndicator } from 'react-native'; // Para o loading
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { View, ActivityIndicator } from 'react-native';
 
-// Nossas Telas
+// Telas de Auth
 import LoginScreen from '../screens/LoginScreen';
-import HomeScreen from '../screens/HomeScreen';
-import RegisterPurchaseScreen from '../screens/RegisterPurchaseScreen';
-import RegisterEmployeeScreen from '../screens/RegisterEmployeeScreen';
-import RegisterTractorScreen from '../screens/RegisterTractorScreen';
-import ManageTractorsScreen from '../screens/ManageTractorsScreen';
-import EditTractorScreen from '../screens/EditTractorScreen';
 
-// Nosso Hook de Autenticação!
-import { useAuth } from '../contexts/AuthContext'; // 1. Importa o hook
+// O NOSSO NOVO MENU LATERAL
+import DrawerNavigator from './DrawerNavigator'; 
 
-// (Os tipos de rotas continuam iguais)
+// Hook de Autenticação
+import { useAuth } from '../contexts/AuthContext';
+
+
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NavigatorScreenParams } from '@react-navigation/native';
+import { DrawerParamList } from './DrawerNavigator';
+
+// 1. Define os parâmetros para cada "Pilha" (Stack)
+// Estas são as telas "filhas"
+
+export type HomeStackParamList = {
+  Home: undefined;
+  RegisterPurchase: undefined;
+};
+
+export type TractorStackParamList = {
+  ManageTractors: undefined;
+  RegisterTractor: undefined;
+  EditTractor: { tratorId: string };
+};
+
+export type EmployeeStackParamList = {
+  ManageEmployees: undefined;
+  RegisterEmployee: undefined;
+  // EditEmployee: { employeeId: string }; // (Quando o fizermos)
+};
+
+// Tipos
 type AuthStackParamList = {
   Login: undefined;
 };
 
-export type AppStackParamList = {
-  Home: undefined;
-  RegisterPurchase: undefined;
-  RegisterEmployee: undefined;
-  RegisterTractor: undefined;
-  ManageTractors: undefined;
-  EditTractor: { tratorId: string };
-};
-
-export type AppScreenProps<T extends keyof AppStackParamList> =
-  NativeStackScreenProps<AppStackParamList, T>;
+// O AppStack foi movido para dentro do Drawer,
+// mas a navegação de Compras e Edição ainda usa Stack.
+// Vamos precisar refatorar o AppStack.
+// Por agora, vamos simplificar.
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
-const AppStack = createNativeStackNavigator<AppStackParamList>();
 
 export default function RootNavigator() {
-  // 2. "Ouve" o Rádio de Autenticação
   const { token, isLoading } = useAuth();
 
-  // 3. Mostra um "Loading..." enquanto o app checa o AsyncStorage
-  // (Isso impede o "flash" da tela de login)
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -52,41 +62,9 @@ export default function RootNavigator() {
 
   return (
     <NavigationContainer>
-      {/* 4. A decisão agora é baseada no TOKEN do Context */}
       {token ? (
-        // Se TEM token: Mostra a pilha principal do App
-        <AppStack.Navigator>
-          <AppStack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ title: 'Minhas Compras' }}
-          />
-          <AppStack.Screen
-            name="RegisterPurchase"
-            component={RegisterPurchaseScreen}
-            options={{ title: 'Registrar Compra' }}
-          />
-          <AppStack.Screen
-            name="RegisterEmployee"
-            component={RegisterEmployeeScreen}
-            options={{ title: 'Novo Funcionário' }}
-          />
-          <AppStack.Screen
-            name="RegisterTractor"
-            component={RegisterTractorScreen}
-            options={{ title: 'Nova Máquina' }}
-          />
-          <AppStack.Screen
-            name="ManageTractors"
-            component={ManageTractorsScreen}
-            options={{ title: 'Gerir Máquinas' }}
-          />
-          <AppStack.Screen
-            name="EditTractor"
-            component={EditTractorScreen}
-            options={{ title: 'Editar Máquina' }}
-          />
-        </AppStack.Navigator>
+        // Se TEM token: Mostra o MENU LATERAL (Drawer)
+        <DrawerNavigator />
       ) : (
         // Se NÃO tem token: Mostra a pilha de autenticação
         <AuthStack.Navigator>
