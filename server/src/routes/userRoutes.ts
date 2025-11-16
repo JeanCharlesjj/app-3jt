@@ -29,6 +29,35 @@ router.get('/employees', async (req, res) => {
 });
 
 // ---
+// Rota: GET /users/:id (READ - Buscar Um)
+// Regra: Somente 'manager' pode ver os detalhes.
+// ---
+router.get('/:id', async (req, res) => {
+  // 1. Verifica a permissão
+  if (req.user?.role !== 'manager') {
+    return res.status(403).send({ error: 'Acesso negado.' });
+  }
+
+  // 2. Valida o ID
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).send({ error: 'ID do usuário é inválido.' });
+  }
+
+  try {
+    // 3. Busca o utilizador no banco
+    const user = await User.findById(id);
+    if (!user || user.isActive === false) {
+      return res.status(404).send({ error: 'Funcionário não encontrado.' });
+    }
+    return res.send(user); // Sucesso
+
+  } catch (err) {
+    return res.status(500).send({ error: 'Falha ao buscar funcionário.' });
+  }
+});
+
+// ---
 // Rota: PUT /users/:id (UPDATE - Editar Funcionário)
 // Regra: Somente 'manager' pode editar.
 // ---

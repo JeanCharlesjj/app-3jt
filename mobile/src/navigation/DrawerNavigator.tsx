@@ -16,6 +16,7 @@ import EditTractorScreen from '../screens/EditTractorScreen';
 
 import ManageEmployeesScreen from '../screens/ManageEmployeesScreen';
 import RegisterEmployeeScreen from '../screens/RegisterEmployeeScreen';
+import EditEmployeeScreen from '../screens/EditEmployeeScreen';
 
 /*
 * ============================================
@@ -50,6 +51,7 @@ function EmployeeStack() {
     <EmployeeStackNav.Navigator screenOptions={{ headerShown: false }}>
       <EmployeeStackNav.Screen name="ManageEmployees" component={ManageEmployeesScreen} />
       <EmployeeStackNav.Screen name="RegisterEmployee" component={RegisterEmployeeScreen} />
+      <EmployeeStackNav.Screen name="EditEmployee" component={EditEmployeeScreen} />
     </EmployeeStackNav.Navigator>
   );
 }

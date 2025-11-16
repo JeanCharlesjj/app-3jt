@@ -72,9 +72,8 @@ export default function ManageEmployeesScreen({ navigation }: Props) {
 
   // 6. Função para EDITAR (por agora, só navega)
   const handleEdit = (employeeId: string) => {
-    // TODO: Criar a tela 'EditEmployeeScreen'
-    Alert.alert('Em breve', 'A tela de edição de funcionário será implementada aqui.');
-    // navigation.navigate('EditEmployee', { employeeId: employeeId });
+    // Remove o Alert e adiciona a navegação
+    navigation.navigate('EditEmployee', { employeeId: employeeId });
   };
 
   // 7. O que renderiza cada item da lista

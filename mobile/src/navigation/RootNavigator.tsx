@@ -34,7 +34,7 @@ export type TractorStackParamList = {
 export type EmployeeStackParamList = {
   ManageEmployees: undefined;
   RegisterEmployee: undefined;
-  // EditEmployee: { employeeId: string }; // (Quando o fizermos)
+  EditEmployee: { employeeId: string };
 };
 
 // Tipos
