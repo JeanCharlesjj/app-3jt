@@ -74,17 +74,22 @@ export default function HomeScreen({ navigation }: Props) {
     <TouchableOpacity
       style={styles.itemContainer}
       onPress={() => navigation.navigate('PurchaseDetail', { purchaseId: item._id })}
-      >
-      {/* O View original está aqui dentro agora */}
+    >
       <Text style={styles.itemTitle}>{item.description}</Text>
       <Text style={styles.itemValue}>
         R$ {item.value.toFixed(2).replace('.', ',')}
       </Text>
+
       <Text style={styles.itemSubtitle}>
-        Máquina: {item.trator.name} ({item.trator.plate})
+        Máquina: {item.trator 
+          ? `${item.trator.name} (${item.trator.plate || 'N/A'})` 
+          : 'Máquina Não Encontrada'}
       </Text>
+
       <Text style={styles.itemSubtitle}>
-        Registado por: {item.user.name}
+        Registado por: {item.user 
+          ? item.user.name 
+          : 'Usuário Excluído'}
       </Text>
     </TouchableOpacity>
   );

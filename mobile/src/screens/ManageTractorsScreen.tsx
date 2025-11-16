@@ -106,6 +106,13 @@ const handleEdit = (tratorId: string) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.addButtonContainer}>
+        <Button
+          title="Adicionar Nova Máquina"
+          onPress={() => navigation.navigate('RegisterTractor')}
+        />
+      </View>
+
       {isLoading ? (
         <ActivityIndicator size="large" style={styles.loader} />
       ) : (
@@ -183,5 +190,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  addButtonContainer: {
+    padding: 15,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
   },
 });
