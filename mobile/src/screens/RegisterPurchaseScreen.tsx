@@ -1,23 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
-import { AppScreenProps } from '../navigation/types';
-import api from '../services/api'; // Nosso 'api.ts'
-import { Picker } from '@react-native-picker/picker'; // O seletor que instalamos
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  ActivityIndicator,
+  Image, // Para mostrar a imagem
+  TouchableOpacity, // Para botões de imagem
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker'; // O Image Picker
+import api from '../services/api'; // O nosso 'api.ts'
+import { AppScreenProps } from '../navigation/types'; // Os nossos tipos
+import { Picker } from '@react-native-picker/picker'; // O seletor
 
-// 1. Define o tipo do Trator
+// --- Interfaces ---
+
+// Define o tipo do Trator
 interface Trator {
   _id: string;
   name: string;
   plate: string;
 }
 
-// 2. Define os campos do formulário
+// Define os campos do formulário
 interface FormData {
   description: string;
   value: string; // Começa como string
   category: 'combustivel' | 'pecas' | 'manutencao' | 'outros';
   paymentMethod: 'pix' | 'boleto' | 'cartao_debito' | 'cartao_credito';
   tratorId: string | null; // ID do trator selecionado
+}
+
+// Define o tipo da imagem selecionada
+interface SelectedImage {
+  uri: string; // Caminho local do ficheiro no telemóvel
+  type: string; // Ex: 'image/jpeg'
+  name: string; // Ex: 'foto.jpg'
 }
 
 // Define as props da tela
@@ -33,10 +54,11 @@ export default function RegisterPurchaseScreen({ navigation }: Props) {
     tratorId: null,
   });
   const [tratores, setTratores] = useState<Trator[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetchingTratores, setIsFetchingTratores] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // Loading do botão "Salvar"
+  const [isFetchingTratores, setIsFetchingTratores] = useState(true); // Loading dos tratores
+  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
 
-  // 3. Efeito que roda UMA VEZ para buscar os tratores
+  // --- Efeito: Buscar Tratores ---
   useEffect(() => {
     async function fetchTratores() {
       try {
@@ -51,12 +73,65 @@ export default function RegisterPurchaseScreen({ navigation }: Props) {
     fetchTratores();
   }, []);
 
-  // 4. Função para atualizar o formulário
+  // --- Funções Auxiliares ---
+
+  // Atualiza o formulário (para inputs de texto e pickers simples)
   const handleChange = (name: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 5. Função de SUBMIT (Salvar)
+  // Pede permissão para câmara e galeria
+  const requestPermissions = async () => {
+    const { status: galleryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (galleryStatus !== 'granted') {
+      Alert.alert('Erro', 'Precisamos da permissão da galeria para isto funcionar.');
+      return false;
+    }
+    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+    if (cameraStatus !== 'granted') {
+      Alert.alert('Erro', 'Precisamos da permissão da câmara para isto funcionar.');
+      return false;
+    }
+    return true;
+  };
+
+  // Abre a câmara ou galeria
+  const handlePickImage = async (type: 'gallery' | 'camera') => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) return;
+
+    let result;
+    try {
+      if (type === 'gallery') {
+        result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 0.8,
+        });
+      } else {
+        result = await ImagePicker.launchCameraAsync({
+          quality: 0.8,
+        });
+      }
+
+      if (!result.canceled) {
+        const asset = result.assets[0];
+        const uriParts = asset.uri.split('/');
+        const fileName = uriParts.pop() || 'image.jpg';
+        const fileType = asset.mimeType || `image/${fileName.split('.').pop()}`;
+
+        setSelectedImage({
+          uri: asset.uri,
+          type: fileType,
+          name: fileName,
+        });
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar a imagem.');
+      console.error(error);
+    }
+  };
+
+  // --- Função Principal: Salvar ---
   const handleSubmit = async () => {
     const { description, value, category, paymentMethod, tratorId } = formData;
 
@@ -72,30 +147,52 @@ export default function RegisterPurchaseScreen({ navigation }: Props) {
     }
 
     setIsLoading(true);
+
     try {
-      await api.post('/compras', {
-        description,
-        value: numericValue,
-        category,
-        paymentMethod,
-        tratorId,
-        purchaseDate: new Date(), // Envia a data atual
+      // Cria um FormData para enviar a imagem
+      const data = new FormData();
+
+      // Adiciona os campos de texto
+      data.append('description', description);
+      data.append('value', String(numericValue));
+      data.append('category', category);
+      data.append('paymentMethod', paymentMethod);
+      data.append('tratorId', tratorId);
+      data.append('purchaseDate', new Date().toISOString());
+
+      // Adiciona o ficheiro (se existir)
+      if (selectedImage) {
+        data.append('receiptImage', {
+          uri: selectedImage.uri,
+          type: selectedImage.type,
+          name: selectedImage.name,
+        } as any);
+      }
+
+      // Envia o FormData para a API
+      await api.post('/compras', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
-      Alert.alert('Sucesso!', 'Compra registrada.');
+      Alert.alert('Sucesso!', 'Compra registada.');
       navigation.goBack(); // Volta para a HomeScreen
+
     } catch (error: any) {
       console.error(error.response?.data);
       Alert.alert(
         'Falha ao Salvar',
-        error.response?.data?.error || 'Não foi possível registrar a compra.'
+        error.response?.data?.error || 'Não foi possível registar a compra.'
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 6. Se ainda estiver buscando tratores, mostra um loading
+  // --- Renderização ---
+
+  // Mostra loading enquanto busca tratores
   if (isFetchingTratores) {
     return (
       <View style={styles.loaderContainer}>
@@ -105,6 +202,7 @@ export default function RegisterPurchaseScreen({ navigation }: Props) {
     );
   }
 
+  // O formulário completo
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.label}>Descrição da Compra</Text>
@@ -128,7 +226,10 @@ export default function RegisterPurchaseScreen({ navigation }: Props) {
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={formData.tratorId}
-          onValueChange={(itemValue) => setFormData((prev) => ({ ...prev, tratorId: itemValue }))}
+          onValueChange={(itemValue) =>
+            // Esta é a correção que fizemos antes
+            setFormData((prev) => ({ ...prev, tratorId: itemValue }))
+          }
         >
           <Picker.Item label="-- Selecione uma máquina --" value={null} />
           {tratores.map((trator) => (
@@ -167,12 +268,35 @@ export default function RegisterPurchaseScreen({ navigation }: Props) {
         </Picker>
       </View>
 
+      {/* Bloco de Upload de Imagem */}
+      <Text style={styles.label}>Nota Fiscal (Opcional)</Text>
+      <View style={styles.imagePickerContainer}>
+        <TouchableOpacity style={styles.imageButton} onPress={() => handlePickImage('gallery')}>
+          <Text style={styles.imageButtonText}>Escolher da Galeria</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.imageButton} onPress={() => handlePickImage('camera')}>
+          <Text style={styles.imageButtonText}>Tirar Foto</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Preview da Imagem */}
+      {selectedImage && (
+        <View style={styles.imagePreviewContainer}>
+          <Image source={{ uri: selectedImage.uri }} style={styles.imagePreview} />
+          <Button title="Remover Imagem" onPress={() => setSelectedImage(null)} color="red" />
+        </View>
+      )}
+
+      {/* Botão de Salvar */}
+      <View style={styles.buttonSpacer} />
       <Button
         title={isLoading ? 'Salvando...' : 'Salvar Compra'}
         onPress={handleSubmit}
         disabled={isLoading}
       />
-      <View style={{ height: 50 }} />
+      
+      {/* Espaço no final para rolar */}
+      <View style={{ height: 50 }} /> 
     </ScrollView>
   );
 }
@@ -203,6 +327,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     paddingHorizontal: 15,
+    marginBottom: 15, // Adicionado para espaçamento
   },
   pickerContainer: {
     backgroundColor: '#fff',
@@ -210,5 +335,38 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     marginBottom: 15,
+  },
+  imagePickerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 15,
+  },
+  imageButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center', // Adicionado
+    flex: 1, // Adicionado
+    marginHorizontal: 5, // Adicionado
+  },
+  imageButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  imagePreviewContainer: {
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  imagePreview: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'contain',
+    borderRadius: 8,
+    marginBottom: 10,
+    borderWidth: 1, // Adicionado
+    borderColor: '#ddd', // Adicionado
+  },
+  buttonSpacer: {
+    marginTop: 20,
   },
 });

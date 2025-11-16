@@ -6,6 +6,8 @@ import tratorRoutes from './routes/tratorRoutes';
 import compraRoutes from './routes/compraRoutes';
 import userRoutes from './routes/userRoutes';
 
+import path from 'path';
+
 dotenv.config();
 
 const app = express();
@@ -17,6 +19,8 @@ app.use('/auth', authRoutes);
 app.use('/tratores', tratorRoutes);
 app.use('/compras', compraRoutes);
 app.use('/users', userRoutes);
+app.use(express.json());
+app.use('/files', express.static(path.resolve(__dirname, '..', 'uploads')));
 
 if (!mongoUri) {
   console.error('Erro: MONGO_URI não definida no arquivo .env');

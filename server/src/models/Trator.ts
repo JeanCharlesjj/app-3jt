@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 // Interface para o TypeScript saber o formato do documento
 export interface ITrator extends Document {
+  _id: mongoose.Types.ObjectId;
   name: string;
   modelName?: string;
   plate?: string;

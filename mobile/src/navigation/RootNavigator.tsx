@@ -23,6 +23,7 @@ import { DrawerParamList } from './DrawerNavigator';
 export type HomeStackParamList = {
   Home: undefined;
   RegisterPurchase: undefined;
+  PurchaseDetail: { purchaseId: string };
 };
 
 export type TractorStackParamList = {

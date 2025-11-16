@@ -4,6 +4,7 @@ import { ITrator } from './Trator'; // Importamos a interface do Trator
 
 // Interface para o TypeScript
 export interface ICompra extends Document {
+  _id: mongoose.Types.ObjectId;
   description: string;
   value: number;
   purchaseDate: Date;
@@ -11,8 +12,8 @@ export interface ICompra extends Document {
   paymentMethod: 'pix' | 'boleto' | 'cartao_debito' | 'cartao_credito';
   receiptImageUrl?: string;
   // --- Relacionamentos ---
-  user: IUser['_id']; // Referência ao ID do Usuário
-  trator: ITrator['_id']; // Referência ao ID do Trator
+  user: IUser | mongoose.Schema.Types.ObjectId;
+  trator: ITrator | mongoose.Schema.Types.ObjectId;
   createdAt: Date;
   isActive: boolean;
 }

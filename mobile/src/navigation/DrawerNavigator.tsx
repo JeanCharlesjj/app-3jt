@@ -9,6 +9,7 @@ import { HomeStackParamList, TractorStackParamList, EmployeeStackParamList } fro
 // Importa TODAS as telas
 import HomeScreen from '../screens/HomeScreen';
 import RegisterPurchaseScreen from '../screens/RegisterPurchaseScreen';
+import PurchaseDetailScreen from '../screens/PurchaseDetailScreen';
 
 import ManageTractorsScreen from '../screens/ManageTractorsScreen';
 import RegisterTractorScreen from '../screens/RegisterTractorScreen';
@@ -30,6 +31,7 @@ function HomeStack() {
     <HomeStackNav.Navigator screenOptions={{ headerShown: false }}>
       <HomeStackNav.Screen name="Home" component={HomeScreen} />
       <HomeStackNav.Screen name="RegisterPurchase" component={RegisterPurchaseScreen} />
+      <HomeStackNav.Screen name="PurchaseDetail" component={PurchaseDetailScreen} />
     </HomeStackNav.Navigator>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Button, ActivityIndicator, Alert, TouchableOpacity, } from 'react-native';
 import { useAuth } from '../contexts/AuthContext'; // Hook de autenticação
 import api from '../services/api'; // Nosso 'api.ts'
 import { AppScreenProps } from '../navigation/types';
@@ -26,6 +26,9 @@ export default function HomeScreen({ navigation }: Props) {
   const [purchases, setPurchases] = useState<Compra[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [totalMes, setTotalMes] = useState(0);
+  const [isLoadingTotal, setIsLoadingTotal] = useState(false);
+
   // 3. Função para buscar os dados no backend
   const fetchPurchases = useCallback(async () => {
     setIsLoading(true);
@@ -44,16 +47,35 @@ export default function HomeScreen({ navigation }: Props) {
     }
   }, []); // useCallback para otimização
 
+  const fetchDashboardData = useCallback(async () => {
+    setIsLoadingTotal(true);
+    try {
+      // Chama a nova rota
+      const response = await api.get('/compras/dashboard');
+      setTotalMes(response.data.totalGastoMes);
+    } catch (error) {
+      console.error(error);
+      // Não precisa de alertar, é só um número
+    } finally {
+      setIsLoadingTotal(false);
+    }
+  }, []);
+
   // 4. Efeito que roda quando a tela fica visível
   useEffect(() => {
     if (isFocused) {
       fetchPurchases();
+      fetchDashboardData();
     }
-  }, [isFocused, fetchPurchases]); // Roda de novo se 'isFocused' mudar
+  }, [isFocused, fetchPurchases, fetchDashboardData]);
 
   // 5. O que renderiza cada item da lista
   const renderItem = ({ item }: { item: Compra }) => (
-    <View style={styles.itemContainer}>
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={() => navigation.navigate('PurchaseDetail', { purchaseId: item._id })}
+      >
+      {/* O View original está aqui dentro agora */}
       <Text style={styles.itemTitle}>{item.description}</Text>
       <Text style={styles.itemValue}>
         R$ {item.value.toFixed(2).replace('.', ',')}
@@ -61,11 +83,10 @@ export default function HomeScreen({ navigation }: Props) {
       <Text style={styles.itemSubtitle}>
         Máquina: {item.trator.name} ({item.trator.plate})
       </Text>
-      {/* A lógica do backend já filtra, mas podemos mostrar quem registrou */}
       <Text style={styles.itemSubtitle}>
-        Registrado por: {item.user.name}
+        Registado por: {item.user.name}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -73,6 +94,17 @@ export default function HomeScreen({ navigation }: Props) {
       <View style={styles.header}>
         <Text style={styles.title}>Olá, {user?.name}</Text>
         <Button title="Sair" onPress={signOut} color="#ff4d4d" />
+      </View>
+
+    <View style={styles.dashboardContainer}>
+        <Text style={styles.dashboardTitle}>Total Gasto este Mês</Text>
+        {isLoadingTotal ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Text style={styles.dashboardValue}>
+            R$ {totalMes.toFixed(2).replace('.', ',')}
+          </Text>
+        )}
       </View>
 
       <Button
@@ -165,5 +197,24 @@ const styles = StyleSheet.create({
   },
   managerButtonSpacer: {
     height: 10, // Apenas um espaçador
+  },
+  dashboardContainer: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    alignItems: 'center',
+    marginBottom: 20, // Espaço antes do botão de cadastro
+  },
+  dashboardTitle: {
+    fontSize: 16,
+    color: '#555',
+  },
+  dashboardValue: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+    marginTop: 5,
   },
 });
